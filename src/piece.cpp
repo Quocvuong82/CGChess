@@ -1,0 +1,192 @@
+#include "colour.h"
+#include "piece.h"
+
+const int Index32ToPiece16[Index32Nb] =
+{
+	PieceNone,
+	RedRook16,
+	RedRook16,
+	RedKnight16,
+	RedKnight16,
+	RedCannon16,
+	RedCannon16,
+	RedPawn16,
+	RedPawn16,
+	RedPawn16,
+	RedPawn16,
+	RedPawn16,
+	RedAdvisor16,
+	RedAdvisor16,
+	RedBishop16,
+	RedBishop16,
+	RedKing16,
+
+	BlackRook16,
+	BlackRook16,
+	BlackKnight16,
+	BlackKnight16,
+	BlackCannon16,
+	BlackCannon16,
+	BlackPawn16,
+	BlackPawn16,
+	BlackPawn16,
+	BlackPawn16,
+	BlackPawn16,
+	BlackAdvisor16,
+	BlackAdvisor16,
+	BlackBishop16,
+	BlackBishop16,
+	BlackKing16
+};
+const int Index32ToColour[Index32Nb] =
+{
+	 ColourNone,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black
+};
+
+const int Piece16ToColour[Piece16Nb] =
+{
+	 ColourNone,//0
+	 Red,//1
+	 Red,//2
+	 Red,//3
+	 Red,//4
+	 Red,//5
+	 Red,//6
+     Red,//7
+	 ColourNone,
+	 Black,//9
+	 Black,//10
+	 Black,//11
+	 Black,//12
+	 Black,//13
+	 Black,//14
+	 Black//15
+};
+
+const int Piece16ToIndex32[Piece16Nb] = 
+{ 
+	PieceNone, 
+	IndexRedRook0,
+	IndexRedKnight0,
+	IndexRedCannon0,
+	IndexRedPawn0,
+	IndexRedAdvisor0,
+	IndexRedBishop0,
+	IndexRedKing,
+    PieceNone,
+	IndexBlackRook0,
+	IndexBlackKnight0,
+	IndexBlackCannon0,
+	IndexBlackPawn0,
+	IndexBlackAdvisor0,
+	IndexBlackBishop0,
+	IndexBlackKing
+};
+
+const char Index32ToChar[Index32Nb + 1] = "!RRNNCCPPPPPAABBKrrnnccpppppaabbk";
+const int Index32ToPiece7[Index32Nb]= 
+{
+	PieceNone,
+	Rook7,
+	Rook7,
+	Knight7,
+	Knight7,
+	Cannon7,
+	Cannon7,
+	Pawn7,
+	Pawn7,
+	Pawn7,
+	Pawn7,
+	Pawn7,
+	Advisor7,
+	Advisor7,
+	Bishop7,
+	Bishop7,
+	King7,
+
+	Rook7,
+	Rook7,
+	Knight7,
+	Knight7,
+	Cannon7,
+	Cannon7,
+	Pawn7,
+	Pawn7,
+	Pawn7,
+	Pawn7,
+	Pawn7,
+	Advisor7,
+	Advisor7,
+	Bishop7,
+	Bishop7,
+	King7
+};
+
+const int Index32Order[Index32Nb] =
+{
+	 -1,
+	 3,
+	 3,
+	 2,
+	 2,
+	 2,
+	 2,
+	 0,
+	 0,
+	 0,
+	 0,
+	 0,
+	 1,
+	 1,
+	 1,
+	 1,
+	 4,
+	 3,
+	 3,
+	 2,
+	 2,
+	 2,
+	 2,
+	 0,
+	 0,
+	 0,
+	 0,
+	 0,
+	 1,
+	 1,
+	 1,
+	 1,
+	 4
+};
