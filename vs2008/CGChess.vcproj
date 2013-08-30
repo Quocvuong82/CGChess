@@ -21,7 +21,7 @@
 			OutputDirectory="..\bin\debug_800"
 			IntermediateDirectory="..\obj_800\debug"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -64,6 +64,7 @@
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				StackReserveSize="404857600"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -173,7 +174,35 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\src\attack.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\board.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\book.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\eval.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\fen.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\hash.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\init.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\list.cpp"
 				>
 			</File>
 			<File
@@ -181,7 +210,43 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\material.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_check.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_do.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_evasion.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_gen.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_legal.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\movetable.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\option.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\pawn.cpp"
 				>
 			</File>
 			<File
@@ -189,7 +254,51 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\posix.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\protocol.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\pst.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\pv.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\recog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\search.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\see.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sort.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\square.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\trans.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\util.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\value.cpp"
 				>
 			</File>
 		</Filter>
@@ -199,7 +308,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\src\attack.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\board.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\book.h"
 				>
 			</File>
 			<File
@@ -207,7 +324,63 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\eval.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\fen.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\hash.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\init.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\material.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_check.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_do.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_evasion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_gen.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\move_legal.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\movetable.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\option.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\pawn.h"
 				>
 			</File>
 			<File
@@ -215,11 +388,59 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\posix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\protocol.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\pst.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\pv.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\random.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\recog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\search.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\see.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sort.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\square.h"
 				>
 			</File>
 			<File
+				RelativePath="..\src\trans.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\util.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\value.h"
 				>
 			</File>
 		</Filter>
