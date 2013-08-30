@@ -1,0 +1,172 @@
+#include "piece.h"
+#include "colour.h"
+const int IndexToPiece[IndexNb] =
+{
+	PieceNone,
+	RedRook,
+	RedRook,
+	RedKnight,
+	RedKnight,
+	RedCannon,
+	RedCannon,
+	RedPawn,
+	RedPawn,
+	RedPawn,
+	RedPawn,
+	RedPawn,
+	RedAdvisor,
+	RedAdvisor,
+	RedBishop,
+	RedBishop,
+	RedKing,
+	BlackRook,
+	BlackRook,
+	BlackKnight,
+	BlackKnight,
+	BlackCannon,
+	BlackCannon,
+	BlackPawn,
+	BlackPawn,
+	BlackPawn,
+	BlackPawn,
+	BlackPawn,
+	BlackAdvisor,
+	BlackAdvisor,
+	BlackBishop,
+	BlackBishop,
+	BlackKing
+};
+
+ const int IndexToColour[IndexNb] =
+ {
+	 ColourNone,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Red,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black,
+	 Black
+ };
+
+ const int  IndexOrder[IndexNb]=
+ {
+	 -1,
+	 3,
+	 3,
+	 2,
+	 2,
+	 2,
+	 2,
+	 0,
+	 0,
+	 0,
+	 0,
+	 0,
+	 1,
+	 1,
+	 1,
+	 1,
+	 4,
+	 3,
+	 3,
+	 2,
+	 2,
+	 2,
+	 2,
+	 0,
+	 0,
+	 0,
+	 0,
+	 0,
+	 1,
+	 1,
+	 1,
+	 1,
+	 4
+ };
+
+ const int   PieceToIndex[16]={ 0, 1, 3, 5, 7, 12, 14, 16, 0, 17, 19, 21, 23, 28, 30, 32 };
+ const char  IndexToChar[IndexNb + 1] = "!RRNNCCPPPPPAABBKrrnnccpppppaabbk";
+
+const int PieceToColour[PieceNb] =
+{
+	 ColourNone,//0
+	 Red,//1
+	 Red,//2
+	 Red,//3
+	 Red,//4
+	 Red,//5
+	 Red,//6
+     Red,//7
+	 ColourNone,
+	 Black,//9
+	 Black,//10
+	 Black,//11
+	 Black,//12
+	 Black,//13
+	 Black,//14
+	 Black//15
+};
+
+const int IndexToType[IndexNb] = 
+{
+	PieceNone,
+	Rook,
+	Rook,
+	Knight,
+	Knight,
+	Cannon,
+	Cannon,
+	Pawn,
+	Pawn,
+	Pawn,
+	Pawn,
+	Pawn,
+	Advisor,
+	Advisor,
+	Bishop,
+	Bishop,
+	King,
+	Rook,
+	Rook,
+	Knight,
+	Knight,
+	Cannon,
+	Cannon,
+	Pawn,
+	Pawn,
+	Pawn,
+	Pawn,
+	Pawn,
+	Advisor,
+	Advisor,
+	Bishop,
+	Bishop,
+	King
+};
