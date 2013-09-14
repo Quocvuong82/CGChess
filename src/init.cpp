@@ -76,7 +76,7 @@ int PassedOpeningMax = 70;
 int PassedEndgameMin = 20;
 int PassedEndgameMax = 140;
 int UnstoppablePasser = 800;
-int FreePasser = 60;
+int FreePasser = 200;
 
 // bishop
 bool UseBishopOutpost = true;

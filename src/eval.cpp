@@ -106,8 +106,8 @@ const int File3BlockPawn = 25;
 const int CityBlockKnight = 80;
 const int NOProtectedKnight = 20;
 const int KingRookAttack = 150;
-const int CannonEmptyHead[13] = { 0, 0, 0, 25, 35, 45, 55, 65, 75, 80, 80, 80 };
-const int Cannon2PieceHead[13] = {0, 0, 0, 20, 18, 16, 10, 8,  6,  4,  4, 4};
+const int CannonEmptyHead[13] = { 0, 0, 0, 35, 40, 45, 55, 65, 75, 80, 80, 80 };
+const int Cannon2PieceHead[13] = {0, 0, 0, 38, 32, 26, 20, 20, 20, 20, 20, 20};
 
 static const int KingAttackWeight[32] =
     {
@@ -125,6 +125,7 @@ static int PinValue[TypeNb][TypeNb];
 static int BlockKnight[TypeNb];
 static int  CannonBatteryPieceValue[TypeNb];
 static int KingAttackUnit[PieceNb];
+static int ThreatValue[TypeNb][TypeNb];
 
 
 #define THROUGH(piece) ((piece)==Empty)
@@ -139,45 +140,14 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 
 static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlArea[2][256]);
 static void eval_king( const board_t *board, const material_info_t *mat_info, int *opening, int *endgame );
+static void eval_passer( const board_t *board, int *opening, int *endgame, int ControlArea[2][256]);
+static void eval_threat(const board_t *board, int *opening, int *endgame, int ControlArea[2][256]);
 
-static bool attackbypawn(board_t *board, int to, int colour)
-{
-   if(colour == Red)// attack by red pawn
-   {
-	   if(SQUARE_IS_OK(to + 16) && INDEX_IS_PAWN(board->square[to + 16]) && INDEX_TO_COLOUR(board->square[to + 16]) == Red)
-		   return true;
-	   if(SQUARE_COLOUR(to) == Black)// passed
-	   {
-		   if(SQUARE_IS_OK(to + 1) && INDEX_IS_PAWN(board->square[to + 1]) && INDEX_TO_COLOUR(board->square[to + 1]) == Red)
-			   return true;
-		   if(SQUARE_IS_OK(to - 1) && INDEX_IS_PAWN(board->square[to - 1]) && INDEX_TO_COLOUR(board->square[to - 1]) == Red)
-			   return true;
-	   }
-   }
-   else
-   {
-	   if(SQUARE_IS_OK(to - 16) && INDEX_IS_PAWN(board->square[to - 16]) && INDEX_TO_COLOUR(board->square[to - 16]) == Black)
-		   return true;
-	   if(SQUARE_COLOUR(to) == Red)// passed
-	   {
-		   if(SQUARE_IS_OK(to + 1) && INDEX_IS_PAWN(board->square[to + 1]) && INDEX_TO_COLOUR(board->square[to + 1]) == Black)
-			   return true;
-		   if(SQUARE_IS_OK(to - 1) && INDEX_IS_PAWN(board->square[to - 1]) && INDEX_TO_COLOUR(board->square[to - 1]) == Black)
-			   return true;
-	   }
-   }
-   return false;
-}
+static bool attackbypawn(board_t *board, int to, int colour);
+static int file_distance(int from, int to);
+static int rank_distance(int from, int to);
+static int pawn_distance(int from, int to);
 
-static int file_distance(int from, int to)
-{
-	return ABS((SQUARE_FILE(from) - SQUARE_FILE(to)));
-};
-
-static int rank_distance(int from, int to)
-{
-	return ABS((SQUARE_RANK(from) - SQUARE_RANK(to)));
-};
 
 // eval_init()
 
@@ -234,18 +204,18 @@ void eval_init()
 
 	AttackAndProtected[Advisor][Rook] = 5;
 	AttackAndProtected[Advisor][Knight] = 5;
-	AttackAndProtected[Advisor][Cannon] = 20;
+	AttackAndProtected[Advisor][Cannon] = 25;
 	AttackAndProtected[Advisor][Pawn] = 20;
-	AttackAndProtected[Advisor][Advisor] = 20;
+	AttackAndProtected[Advisor][Advisor] = 35;
 	AttackAndProtected[Advisor][Bishop] = 0;
 	AttackAndProtected[Advisor][King] = 0;
 
 	AttackAndProtected[Bishop][Rook] = 5;
 	AttackAndProtected[Bishop][Knight] = 5;
-	AttackAndProtected[Bishop][Cannon] = 5;
+	AttackAndProtected[Bishop][Cannon] = 8;
 	AttackAndProtected[Bishop][Pawn] = 20;
 	AttackAndProtected[Bishop][Advisor] = 0;
-	AttackAndProtected[Bishop][Bishop] = 20;
+	AttackAndProtected[Bishop][Bishop] = 35;
 	AttackAndProtected[Bishop][King] = 0;
 
 	AttackAndProtected[King][Rook] = 0;
@@ -254,7 +224,66 @@ void eval_init()
 	AttackAndProtected[King][Pawn] = 0;
 	AttackAndProtected[King][Advisor] = 0;
 	AttackAndProtected[King][Bishop] = 0;
-	AttackAndProtected[King][King] = 0; 
+	AttackAndProtected[King][King] = 0;
+
+	//threat
+	ThreatValue[Rook][Rook] =  0;
+	ThreatValue[Rook][Knight] = 40;
+	ThreatValue[Rook][Cannon] = 39;
+	ThreatValue[Rook][Pawn] = 15;
+	ThreatValue[Rook][Advisor] = 13;
+	ThreatValue[Rook][Bishop] = 14;
+	ThreatValue[Rook][King] = 0;
+
+	ThreatValue[Knight][Rook] = 60;
+	ThreatValue[Knight][Knight] = 15;
+	ThreatValue[Knight][Cannon] = 31;
+	ThreatValue[Knight][Pawn] = 4;
+	ThreatValue[Knight][Advisor] = 6;
+	ThreatValue[Knight][Bishop] = 6;
+	ThreatValue[Knight][King] = 0;
+
+	ThreatValue[Cannon][Rook] = 60;
+	ThreatValue[Cannon][Knight] = 36;
+	ThreatValue[Cannon][Cannon] = 13;
+	ThreatValue[Cannon][Pawn] = 4;
+	ThreatValue[Cannon][Advisor] = 11;
+	ThreatValue[Cannon][Bishop] = 14;
+	ThreatValue[Cannon][King] = 0;
+
+	ThreatValue[Pawn][Rook] = 60;
+	ThreatValue[Pawn][Knight] = 50;
+	ThreatValue[Pawn][Cannon] = 50;
+	ThreatValue[Pawn][Pawn] = 0;
+	ThreatValue[Pawn][Advisor] = 0;
+	ThreatValue[Pawn][Bishop] = 0;
+	ThreatValue[Pawn][King] = 0;
+
+	ThreatValue[Advisor][Rook] = 100;
+	ThreatValue[Advisor][Knight] = 50;
+	ThreatValue[Advisor][Cannon] = 60;
+	ThreatValue[Advisor][Pawn] = 40;
+	ThreatValue[Advisor][Advisor] = 0;
+	ThreatValue[Advisor][Bishop] = 0;
+	ThreatValue[Advisor][King] = 0;
+
+	ThreatValue[Bishop][Rook] = 100;
+	ThreatValue[Bishop][Knight] = 50;
+	ThreatValue[Bishop][Cannon] = 60;
+	ThreatValue[Bishop][Pawn] = 40;
+	ThreatValue[Bishop][Advisor] = 0;
+	ThreatValue[Bishop][Bishop] = 0;
+	ThreatValue[Bishop][King] = 0;
+
+	ThreatValue[King][Rook] = 0;
+	ThreatValue[King][Knight] = 0;
+	ThreatValue[King][Cannon] = 0;
+	ThreatValue[King][Pawn] = 0;
+	ThreatValue[King][Advisor] = 0;
+	ThreatValue[King][Bishop] = 0;
+	ThreatValue[King][King] = 0;
+
+
 
     // Pin
 	PinValue[Rook][Rook] =  40;
@@ -274,7 +303,7 @@ void eval_init()
 	PinValue[Knight][King] = 0;
 
 	PinValue[Cannon][Rook] = 50;
-	PinValue[Cannon][Knight] = 50;
+	PinValue[Cannon][Knight] = 60;
 	PinValue[Cannon][Cannon] = 10;
 	PinValue[Cannon][Pawn] = 0;
 	PinValue[Cannon][Advisor] = 0;
@@ -328,7 +357,7 @@ void eval_init()
 	CannonBatteryPieceValue[Cannon] = 40;
 	CannonBatteryPieceValue[Pawn] = 3;
 	CannonBatteryPieceValue[Advisor] = 3;
-	CannonBatteryPieceValue[Bishop] = 3;
+	CannonBatteryPieceValue[Bishop] = 26;
 	CannonBatteryPieceValue[King] = 3;
 
 	for ( piece = 0; piece < PieceNb; piece++ )
@@ -383,6 +412,10 @@ int eval( board_t *board, int alpha, int beta, int ThreadId )
 	eval_pattern(board, &opening, &endgame, ControlArea);
 
 	eval_king( board, mat_info,  &opening, &endgame );
+
+	eval_passer(board,  &opening, &endgame, ControlArea);
+
+	eval_threat(board,  &opening, &endgame, ControlArea);
 
 	if (UseTempo)
 	{
@@ -1232,8 +1265,8 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 								}
 								else
 								{
-									op[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/2;
-								    eg[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/2;
+									op[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/4;
+								    eg[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/4;
 								}
 							}
 
@@ -1273,8 +1306,8 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 								}
 								else
 								{
-									op[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/2;
-								    eg[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/2;
+									op[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/4;
+								    eg[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/4;
 								}
 							}
 						}
@@ -1310,8 +1343,8 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 								}
 								else
 								{
-									op[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/2;
-								    eg[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/2;
+									op[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/4;
+								    eg[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/4;
 								}
 							}
 						}
@@ -1347,8 +1380,8 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 								}
 								else
 								{
-									op[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/2;
-								    eg[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/2;
+									op[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/4;
+								    eg[me] += PinValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])]/4;
 								}
 							}
 						}
@@ -1446,9 +1479,11 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 				break;
 			case RedAdvisor:
 			case BlackAdvisor:
+
 				break;
 			case RedBishop:
 			case BlackBishop:
+
 				break;
 			case RedKing:
 			case BlackKing:
@@ -1601,6 +1636,376 @@ static void eval_king( const board_t *board, const material_info_t *mat_info, in
 	*opening += ((op[Red] - op[Black]) * KingSafetyWeightOpening) / 256;
 	*endgame += ((eg[Red] - eg[Black]) * KingSafetyWeightEndgame) / 256;
 }
+
+static void eval_passer( const board_t *board, int *opening, int *endgame, int ControlArea[2][256])
+{
+
+	int colour;
+	int op[ColourNb], eg[ColourNb];
+	int att, def;
+	int file, rank;
+	int sq;
+	int min, max;
+	int delta;
+	int index_start, index_end;
+	int i;
+	int Bonus[RankNb] = { 256, 256, 256, 256, 192, 128, 64, 32, 16, 8, 4, 2, 1, 0};
+
+
+	ASSERT(board != NULL);
+	ASSERT(pawn_info != NULL);
+	ASSERT(opening != NULL);
+	ASSERT(endgame != NULL);
+
+	// init
+
+	for ( colour = 0; colour < ColourNb; colour++ )
+	{
+		op[colour] = 0;
+		eg[colour] = 0;
+	}
+
+	// passed pawns
+
+	for ( colour = 0; colour < ColourNb; colour++ )
+	{
+
+		att = colour;
+		def = COLOUR_OPP(att);
+
+		if(att == Red)
+		{
+			index_start = PIECE_TO_INDEX(RedPawn);
+			index_end    = index_start + 5;
+		}
+		else
+		{
+			index_start = PIECE_TO_INDEX(BlackPawn);
+			index_end    = index_start + 5;
+		}
+
+		for( i = index_start; i < index_end; ++i)
+		{
+			sq = board->piece[i];
+			if(sq == SquareNone) continue;
+			if(SQUARE_COLOUR(sq) != def) continue;
+
+			rank = SQUARE_RANK(sq) - 3;
+			file = SQUARE_FILE(sq) - 3;
+
+			if(att == Red)
+			{
+				op[att] += PassedOpeningMin + ((PassedOpeningMax - PassedOpeningMin) * Bonus[rank] + 128) / 256;
+			}
+			else
+			{
+				op[att] += PassedOpeningMin + ((PassedOpeningMax - PassedOpeningMin) * Bonus[9-rank] + 128) / 256;
+			}
+
+			min = PassedEndgameMin;
+			max = PassedEndgameMax;
+
+			delta = max - min;
+
+			if(att == Red)
+			{
+                if(board->number[BlackRook] + board->number[BlackKnight] + board->number[BlackCannon] == 0)
+				{
+                    delta += FreePasser;
+				}
+				else if(board->number[BlackRook] == 0 && ControlArea[att][sq] >= ControlArea[def][sq])
+				{
+                    delta += FreePasser/2;
+				}
+				else if(ControlArea[att][sq] >= ControlArea[def][sq])
+				{
+                     delta += FreePasser/4;
+				}
+
+				if(board->number[BlackAdvisor] == 0)
+				{
+                     delta += FreePasser/4;
+				}
+			}
+			else
+			{
+                if(board->number[RedRook] + board->number[RedKnight] + board->number[RedCannon] == 0)
+				{
+                    delta += FreePasser;
+				}
+				else if(board->number[RedRook] == 0 && ControlArea[att][sq] >= ControlArea[def][sq])
+				{
+                    delta += FreePasser/2;
+				}
+				else if(ControlArea[att][sq] >= ControlArea[def][sq])
+				{
+                     delta += FreePasser/4;
+				}
+
+				if(board->number[RedAdvisor] == 0)
+				{
+					delta += FreePasser/4;
+				}
+			}
+
+			// king-distance bonus
+			delta += pawn_distance(sq, KING_POS(board, def))* AttackerDistance;
+
+			// endgame scoring
+
+			eg[att] += min;
+
+			if( delta > 0 )
+			{				
+				if(att == Red)
+				{
+					eg[att] += 0 + ((delta - 0) * Bonus[rank] + 128) / 256;
+				}
+				else
+				{
+					eg[att] += 0 + ((delta - 0) * Bonus[9-rank] + 128) / 256;
+				}
+			}
+		}
+	}
+
+	*opening += ((op[Red] - op[Black]) * PassedPawnWeightOpening) / 256;
+	*endgame += ((eg[Red] - eg[Black]) * PassedPawnWeightEndgame) / 256;
+}
+
+void eval_threat(const board_t *board, int *opening, int *endgame, int ControlArea[2][256])
+{
+	int me, opp;
+	int from, to;
+	int row, col;
+	int filebit, rankbit;
+	int i, index;
+	int start, end;
+	int colour;
+	int op[ColourNb], eg[ColourNb];
+
+	ASSERT(list != NULL);
+	ASSERT(board != NULL);
+
+	for ( colour = 0; colour < ColourNb; colour++ )
+	{
+		op[colour] = 0;
+		eg[colour] = 0;
+	}
+
+	for(colour = 0; colour < ColourNb; ++colour)
+	{
+
+		me = colour;
+		opp = COLOUR_OPP(me);
+
+		start = INDEX_START(me);
+		end   = INDEX_END(me);
+
+		for( i= start; i <= end; ++i)
+		{
+			if(board->piece[i] == SquareNone) continue;
+
+			from = board->piece[i];
+			switch(INDEX_TO_PIECE(i))
+			{
+			case RedRook:
+			case BlackRook:
+				row = SQUARE_RANK(from) - 3;
+				col = SQUARE_FILE(from) - 3;
+				filebit =  board->file[col];
+				rankbit =  board->rank[row];
+				index=0;
+				while(FileCapMoves[row][filebit][index])
+				{
+					to = FileCapMoves[row][filebit][index] + col;
+					if(!INDEX_SAME_COLOUR(board->square[from], board->square[to]))
+					{
+						op[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+						eg[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+					}
+
+					++index;				
+				}
+
+				index=0;			
+				while(RankCapMoves[col][rankbit][index])
+				{	
+					to = RankCapMoves[col][rankbit][index] + (row<<4);
+					if(!INDEX_SAME_COLOUR(board->square[from], board->square[to]))
+					{
+						op[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+						eg[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+					}
+					++index;				
+				}
+
+				break;
+
+			case RedCannon:
+			case BlackCannon:
+				row = SQUARE_RANK(from) - 3;
+				col = SQUARE_FILE(from) - 3;
+				filebit = board->file[col];
+				rankbit = board->rank[row];
+
+				index=0;
+				while( CannonFileCapMoves[row][filebit][index])
+				{
+					to = CannonFileCapMoves[row][filebit][index] + col;
+					if(!INDEX_SAME_COLOUR(board->square[from], board->square[to]))
+					{
+						op[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+						eg[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+					}
+
+					++index;				
+				}
+
+				index=0;			
+				while(CannonRankCapMoves[col][rankbit][index])
+				{
+					to = CannonRankCapMoves[col][rankbit][index] + (row<<4);
+					if(!INDEX_SAME_COLOUR(board->square[from], board->square[to]))
+					{
+						op[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+						eg[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+					}
+
+					++index;
+				}
+
+				break;
+
+			case RedKnight:
+			case BlackKnight:
+
+				index=0;
+				to = KnightMoves[from][index];
+				while(to != SquareNone)
+				{
+					if(board->square[HorseLegs[from][index]] == PieceNone)
+					{
+						if(!INDEX_SAME_COLOUR(board->square[from], board->square[to]) &&  board->square[to]  != PieceNone)
+						{
+							op[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+							eg[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+						}
+					}
+					to = KnightMoves[from][++index];
+
+				}
+				break;
+
+			case RedPawn:
+			case BlackPawn:
+				index=0;
+				to = PawnMoves[me][from][index];
+				while(to != SquareNone)
+				{				
+					if(!INDEX_SAME_COLOUR(board->square[from], board->square[to]) && board->square[to]  != PieceNone)
+					{
+						op[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+						eg[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+					}
+					to = PawnMoves[me][from][++index];
+
+				}
+				break;
+
+			case RedAdvisor:
+			case BlackAdvisor:
+				index=0;
+				to = AdvisorMoves[from][index];
+				while(to != SquareNone)
+				{				
+					if(!INDEX_SAME_COLOUR(board->square[from], board->square[to]) && board->square[to]  != PieceNone)
+					{
+						op[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+						eg[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+					}
+					to = AdvisorMoves[from][++index];
+
+				}
+				break;
+
+			case RedBishop:
+			case BlackBishop:
+				index=0;
+				to=BishopMoves[from][index];
+				while(to != SquareNone)
+				{
+					if(board->square[ElephantEyes[from][index]] == PieceNone)
+					{					
+						if(!INDEX_SAME_COLOUR(board->square[from], board->square[to]) && board->square[to]  != PieceNone)
+						{
+							op[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+							eg[me] += ThreatValue[INDEX_TO_TYPE(board->square[from])][INDEX_TO_TYPE(board->square[to])];
+						}
+					}
+					to=BishopMoves[from][++index];
+
+				}
+				break;
+
+			case RedKing:
+			case BlackKing:
+				break;
+			default:
+				ASSERT(false);
+				break;
+			}
+		}
+	}
+
+	*opening += ((op[Red] - op[Black]) * 256) / 256;
+	*endgame += ((eg[Red] - eg[Black]) * 256) / 256;
+}
+
+bool attackbypawn(board_t *board, int to, int colour)
+{
+   if(colour == Red)// attack by red pawn
+   {
+	   if(SQUARE_IS_OK(to + 16) && INDEX_IS_PAWN(board->square[to + 16]) && INDEX_TO_COLOUR(board->square[to + 16]) == Red)
+		   return true;
+	   if(SQUARE_COLOUR(to) == Black)// passed
+	   {
+		   if(SQUARE_IS_OK(to + 1) && INDEX_IS_PAWN(board->square[to + 1]) && INDEX_TO_COLOUR(board->square[to + 1]) == Red)
+			   return true;
+		   if(SQUARE_IS_OK(to - 1) && INDEX_IS_PAWN(board->square[to - 1]) && INDEX_TO_COLOUR(board->square[to - 1]) == Red)
+			   return true;
+	   }
+   }
+   else
+   {
+	   if(SQUARE_IS_OK(to - 16) && INDEX_IS_PAWN(board->square[to - 16]) && INDEX_TO_COLOUR(board->square[to - 16]) == Black)
+		   return true;
+	   if(SQUARE_COLOUR(to) == Red)// passed
+	   {
+		   if(SQUARE_IS_OK(to + 1) && INDEX_IS_PAWN(board->square[to + 1]) && INDEX_TO_COLOUR(board->square[to + 1]) == Black)
+			   return true;
+		   if(SQUARE_IS_OK(to - 1) && INDEX_IS_PAWN(board->square[to - 1]) && INDEX_TO_COLOUR(board->square[to - 1]) == Black)
+			   return true;
+	   }
+   }
+   return false;
+}
+
+int file_distance(int from, int to)
+{
+	return ABS((SQUARE_FILE(from) - SQUARE_FILE(to)));
+};
+
+int rank_distance(int from, int to)
+{
+	return ABS((SQUARE_RANK(from) - SQUARE_RANK(to)));
+};
+
+int pawn_distance(int from, int to)
+{
+	return  file_distance(from, to) + rank_distance(from, to);
+}
+
 
 
 

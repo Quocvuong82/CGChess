@@ -2073,7 +2073,7 @@ static bool move_is_dangerous( int move, board_t *board )
 			rowbit = board->rank[row];
 			colbit = board->file[col];
 
-			if(PinNb[row][SQUARE_RANK(king_opp)][colbit] <= 2)
+			if(PinNb[row][SQUARE_RANK(king_opp)][colbit] == 0)
 			{
 				return true;
 			}
@@ -2084,8 +2084,8 @@ static bool move_is_dangerous( int move, board_t *board )
 			col = SQUARE_FILE(to);
 			rowbit = board->rank[row];
 			colbit = board->file[col];
-			if(PinNb[col][SQUARE_FILE(king_opp)][rowbit] <= 2)
-			{
+			if(PinNb[col][SQUARE_FILE(king_opp)][rowbit] == 0)
+			{				
 				return true;
 			}
 		}
