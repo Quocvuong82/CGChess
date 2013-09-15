@@ -103,6 +103,7 @@ const int PawnMobEnd[5] = {0, 10, 20, 30, 0};
 const int RookMobOpen[21] = {-50, -30, -20, -10, 10, 20, 30, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35};
 const int RookMobEnd[21] = {-50, -30, -20, -10, 6, 12, 18, 20, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30};
 const int File3BlockPawn = 25;
+const int BlockBishop = 5;
 const int CityBlockKnight = 80;
 const int NOProtectedKnight = 20;
 const int KingRookAttack = 150;
@@ -386,6 +387,7 @@ int eval( board_t *board, int alpha, int beta, int ThreadId )
 	pawn_info_t pawn_info[1];
 	int phase;
 	int eval;
+	int mul[ColourNb];
 	int lazy_eval;
 	int ControlArea[2][256] = {0};
 
@@ -397,6 +399,13 @@ int eval( board_t *board, int alpha, int beta, int ThreadId )
 	// material
 
 	material_get_info(mat_info, board, ThreadId);
+
+	if(mat_info->mul[Red] == 0 && mat_info->mul[Black] == 0)
+		return ValueDraw;
+
+	mul[Red] = mat_info->mul[Red];
+	mul[Black] = mat_info->mul[Black];
+
 
 	opening += mat_info->opening;
 	endgame += mat_info->endgame;
@@ -433,6 +442,25 @@ int eval( board_t *board, int alpha, int beta, int ThreadId )
 
 	phase = mat_info->phase;
 	eval = ((opening * (256 - phase)) + (endgame * phase)) / 256;
+
+
+	if( eval > ValueDraw )
+	{
+		eval = (eval * mul[Red]) / 16;
+	}
+	else if( eval < ValueDraw )
+	{
+		eval = (eval * mul[Black]) / 16;
+	}
+
+	// value range
+
+	if( eval < -ValueEvalInf )
+		eval = -ValueEvalInf;
+
+	if( eval > +ValueEvalInf )
+		eval = +ValueEvalInf;
+
 	if( COLOUR_IS_BLACK(board->turn) )
 		eval = -eval;
 
@@ -1483,7 +1511,19 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 				break;
 			case RedBishop:
 			case BlackBishop:
+				index=0;
+				to=BishopMoves[from][index];
+				while(to != SquareNone)
+				{
+					if(board->square[ElephantEyes[from][index]] != PieceNone)
+					{	
+						op[me] +=  BlockBishop;
+						eg[me] +=  BlockBishop;
+					}
 
+					to=BishopMoves[from][++index];
+
+				}
 				break;
 			case RedKing:
 			case BlackKing:

@@ -230,6 +230,48 @@ static void material_comp_info( material_info_t *info, const board_t *board )
 	rpromote = rbishop + radvisor;
 	bpromote = bbishop + badvisor;
 
+	if(rattack + rpromote == 0 && battack + bpromote == 0)
+	{
+		info->recog = MAT_KK;
+	}
+	else if(rattack == 0 && battack == 0)
+	{
+		info->recog = MAT_KABKAB;
+	}
+	else if(rattack == 1 && rpawn == 1 && battack == 0 && bpromote >= 2)
+	{
+         info->recog = MAT_KPKAB;
+	}
+	else if(battack == 1 && bpawn == 1 && rattack == 0 && rpromote >= 2)
+	{
+		 info->recog = MAT_KABKP;
+	}
+	else if(rattack == 1 && rrook == 1 && battack == 0 && bpromote == 4)
+	{ 
+		 info->recog = MAT_KRKAB; 
+	}
+	else if(battack == 1 && brook == 1 && rattack == 0 && rpromote == 4)
+	{ 
+		info->recog = MAT_KABKR; 
+	}
+	else if(rattack == 1 && battack == 1 && rrook == 1 && brook == 1)
+	{
+         info->recog = MAT_KRKR; 
+	}
+	else if(rattack == 1 && battack == 1 && rknight == 1 && bknight == 1)
+	{
+         info->recog = MAT_KNKN; 
+	}
+	else if(rattack == 1 && battack == 1 && rcannon == 1 && bcannon == 1)
+	{
+		info->recog = MAT_KCKC; 
+	}
+	else if(rattack == 1 && battack == 1 && rpawn == 1 && bpawn == 1)
+	{
+		info->recog = MAT_KPKP; 
+	}
+
+
 	//和棋判断
 
 	mul[Red] = 16;
@@ -661,6 +703,95 @@ static void material_comp_info( material_info_t *info, const board_t *board )
 
 	ASSERT(opening <= ValueEvalInf && opening >= -ValueEvalInf);
 	ASSERT(endgame <= ValueEvalInf && endgame >= -ValueEvalInf);
+
+
+	// material imbalances
+	if(UseMaterialImbalance)
+	{
+		// rook & bishop vs rook & knight
+		if(rrook == 1 && rcannon == 1 && rknight == 0 && brook == 1 && bcannon == 0 && bknight == 1)
+		{
+			opening += 10 * MaterialImbalanceWeightOpening / 256;
+			endgame += 10 * MaterialImbalanceWeightEndgame / 256;
+		}
+		if(rrook == 1 && rcannon == 0 && rknight == 1 && brook == 1 && bcannon == 1 && bknight == 0)
+		{
+			opening -= 10 * MaterialImbalanceWeightOpening / 256;
+			endgame -= 10 * MaterialImbalanceWeightEndgame / 256;
+		}
+
+		// 3pawn
+		if(rrook == 0 && rm == 0 && brook == 0 && bm == 0 && rpawn - bpawn >= 3)
+		{
+			opening += 500 * MaterialImbalanceWeightOpening / 256;
+			endgame += 500 * MaterialImbalanceWeightEndgame / 256;
+			opening += (rpawn + bpawn) * 2 * MaterialImbalanceWeightOpening / 256;
+			endgame += (rpawn + bpawn) * 2 * MaterialImbalanceWeightEndgame / 256;
+		}
+
+		if(rrook == 0 && rm == 0 && brook == 0 && bm == 0 && bpawn - rpawn >= 3)
+		{
+			opening -= 500 * MaterialImbalanceWeightOpening / 256;
+			endgame -= 500 * MaterialImbalanceWeightEndgame / 256;
+			opening -= (rpawn + bpawn) * 2 * MaterialImbalanceWeightOpening / 256;
+			endgame -= (rpawn + bpawn) * 2 * MaterialImbalanceWeightEndgame / 256;
+		}
+
+		// 少子与多兵
+		if(rm == bm + 1 && rpawn == bpawn - 3)
+		{
+			opening -= 20 * MaterialImbalanceWeightOpening / 256;
+			endgame -= 20 * MaterialImbalanceWeightEndgame / 256;
+			opening -= (rpawn + bpawn) * 2 * MaterialImbalanceWeightOpening / 256;
+			endgame -= (rpawn + bpawn) * 2 * MaterialImbalanceWeightEndgame / 256;
+		}
+		if(bm == rm + 1 && bpawn == rpawn - 3)
+		{
+			opening += 20 * MaterialImbalanceWeightOpening / 256;
+			endgame += 20 * MaterialImbalanceWeightEndgame / 256;
+			opening += (rpawn + bpawn) * 2 * MaterialImbalanceWeightOpening / 256;
+			endgame += (rpawn + bpawn) * 2 * MaterialImbalanceWeightEndgame / 256;
+		}
+
+		if(rm == bm + 1 && rpawn <= bpawn - 4)
+		{
+			opening -= 50 * MaterialImbalanceWeightOpening / 256;
+			endgame -= 50 * MaterialImbalanceWeightEndgame / 256;
+			opening -= (rpawn + bpawn) * 2 * MaterialImbalanceWeightOpening / 256;
+			endgame -= (rpawn + bpawn) * 2 * MaterialImbalanceWeightEndgame / 256;
+		}
+		if(bm == rm + 1 && bpawn <= rpawn - 4)
+		{
+			opening += 50 * MaterialImbalanceWeightOpening / 256;
+			endgame += 50 * MaterialImbalanceWeightEndgame / 256;
+			opening += (rpawn + bpawn) * 2 * MaterialImbalanceWeightOpening / 256;
+			endgame += (rpawn + bpawn) * 2 * MaterialImbalanceWeightEndgame / 256;
+		}
+
+		// 缺士怕rook
+		if(rrook == 2 && badvisor == 1)
+		{
+			opening += 10 * MaterialImbalanceWeightOpening / 256;
+			endgame += 10 * MaterialImbalanceWeightEndgame / 256;
+		}
+		if(brook == 2 && radvisor == 1)
+		{
+			opening -= 10 * MaterialImbalanceWeightOpening / 256;
+			endgame -= 10 * MaterialImbalanceWeightEndgame / 256;
+		}
+		// 缺相怕炮
+		if(rcannon > 1 && rrook > 1 && bbishop <= 1)
+		{
+			opening += 10 * MaterialImbalanceWeightOpening / 256;
+			endgame += 10 * MaterialImbalanceWeightEndgame / 256;
+		}
+		if(bcannon > 1 && brook > 1 && rbishop <= 1)
+		{
+			opening -= 10 * MaterialImbalanceWeightOpening / 256;
+			endgame -= 10 * MaterialImbalanceWeightEndgame / 256;
+		}  
+	}  
+    // end material imbalances
 
 	for ( colour = 0; colour < ColourNb; colour++ )
 		info->mul[colour] = mul[colour];
