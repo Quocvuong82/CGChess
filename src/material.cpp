@@ -769,27 +769,83 @@ static void material_comp_info( material_info_t *info, const board_t *board )
 		}
 
 		// È±Ê¿ÅÂrook
-		if(rrook == 2 && badvisor == 1)
+		if(rrook == 2 )
 		{
-			opening += 10 * MaterialImbalanceWeightOpening / 256;
-			endgame += 10 * MaterialImbalanceWeightEndgame / 256;
+			if(badvisor == 1)
+			{
+				opening += 30 * MaterialImbalanceWeightOpening / 256;
+				endgame += 30 * MaterialImbalanceWeightEndgame / 256;
+			}
+			else if(badvisor == 0)
+			{
+				opening += 60 * MaterialImbalanceWeightOpening / 256;
+				endgame += 60 * MaterialImbalanceWeightEndgame / 256;
+			}
 		}
-		if(brook == 2 && radvisor == 1)
+		if(brook == 2 )
 		{
-			opening -= 10 * MaterialImbalanceWeightOpening / 256;
-			endgame -= 10 * MaterialImbalanceWeightEndgame / 256;
+			if(radvisor == 1)
+			{
+				opening -= 30 * MaterialImbalanceWeightOpening / 256;
+				endgame -= 30 * MaterialImbalanceWeightEndgame / 256;
+			}
+			else if(radvisor == 0)
+			{
+				opening -= 60 * MaterialImbalanceWeightOpening / 256;
+				endgame -= 60 * MaterialImbalanceWeightEndgame / 256;
+			}
 		}
 		// È±ÏàÅÂÅÚ
 		if(rcannon > 1 && rrook > 1 && bbishop <= 1)
 		{
-			opening += 10 * MaterialImbalanceWeightOpening / 256;
-			endgame += 10 * MaterialImbalanceWeightEndgame / 256;
+			opening += 20 * MaterialImbalanceWeightOpening / 256;
+			endgame += 20 * MaterialImbalanceWeightEndgame / 256;
 		}
 		if(bcannon > 1 && brook > 1 && rbishop <= 1)
 		{
-			opening -= 10 * MaterialImbalanceWeightOpening / 256;
-			endgame -= 10 * MaterialImbalanceWeightEndgame / 256;
-		}  
+			opening -= 20 * MaterialImbalanceWeightOpening / 256;
+			endgame -= 20 * MaterialImbalanceWeightEndgame / 256;
+		}
+
+		if(rrook + rm > 2)
+		{
+			if(badvisor == 1 && bbishop == 1)
+			{
+				opening += 40 * MaterialImbalanceWeightOpening / 256;
+				endgame += 40 * MaterialImbalanceWeightEndgame / 256;
+			}
+			else if(badvisor + bbishop == 1)
+			{
+				opening += 60 * MaterialImbalanceWeightOpening / 256;
+				endgame += 60 * MaterialImbalanceWeightEndgame / 256;
+			}
+			else if(badvisor + bbishop == 0)
+			{
+				opening += 260 * MaterialImbalanceWeightOpening / 256;
+				endgame += 260 * MaterialImbalanceWeightEndgame / 256;
+			}
+		}
+
+		if(brook + bm > 2)
+		{
+			if(radvisor == 1 && rbishop == 1)
+			{
+				opening -= 40 * MaterialImbalanceWeightOpening / 256;
+				endgame -= 40 * MaterialImbalanceWeightEndgame / 256;
+			}
+			else if(radvisor + rbishop == 1)
+			{
+				opening -= 60 * MaterialImbalanceWeightOpening / 256;
+				endgame -= 60 * MaterialImbalanceWeightEndgame / 256;
+			}
+			else if(radvisor + rbishop == 0)
+			{
+				opening -= 260 * MaterialImbalanceWeightOpening / 256;
+				endgame -= 260 * MaterialImbalanceWeightEndgame / 256;
+			}
+		}
+
+
 	}  
     // end material imbalances
 

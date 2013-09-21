@@ -93,6 +93,31 @@ const int CannonOutPost[2][90] =
 	0,	 0,  0,  0,  0,  0,  0,  0,  0, 
 };
 
+const int SpaceControlArea[2][90] = 
+{
+	1,	 1,  2,  3,  4,  3,  2,  1,  1,
+	1,	 1,  1,  1,  3,  1,  1,  1,  1,
+	1,	 1,  1,  1,  1,  1,  1,  1,  1,
+	1,	 1,  1,  1,  1,  1,  1,  1,  1,
+	1,	 1,  1,  1,  1,  1,  1,  1,  1,
+	0,	 1,  1,  1,  1,  1,  1,  1,  0,
+	0,	 0,  0,  0,  1,  0,  0,  0,  0,
+	0,	 0,  0,  0,  0,  0,  0,  0,  0,
+	0,	 0,  0,  0,  0,  0,  0,  0,  0, 
+	0,	 0,  0,  0,  0,  0,  0,  0,  0, 
+
+	0,	 0,  0,  0,  0,  0,  0,  0,  0,
+	0,	 0,  0,  0,  0,  0,  0,  0,  0,
+	0,	 0,  0,  0,  0,  0,  0,  0,  0,
+	0,	 0,  0,  0,  1,  0,  0,  0,  0, 
+	0,	 1,  1,  1,  1,  1,  1,  1,  0, 
+	1,	 1,  1,  1,  1,  1,  1,  1,  1,
+	1,	 1,  1,  1,  1,  1,  1,  1,  1,
+	1,	 1,  1,  1,  1,  1,  1,  1,  1,
+	1,	 1,  1,  1,  3,  1,  1,  1,  1,
+	1,	 1,  2,  3,  4,  3,  2,  1,  1,
+};
+
 const int KnightMobOpen[10] = { -50, -10, 0, 10, 30, 40, 50, 52, 54, 56};
 const int KnightMobEnd[10] =  { -50, -10, 0, 10, 30, 40, 50, 52, 54, 56};
 const int CannonControlOpen[22] = { 0, 10, 15, 18, 20, 22, 24, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25 ,25, 25, 25, 25};
@@ -107,6 +132,7 @@ const int BlockBishop = 5;
 const int CityBlockKnight = 80;
 const int NOProtectedKnight = 20;
 const int KingRookAttack = 150;
+const int Rook3Attack = 100;
 const int CannonEmptyHead[13] = { 0, 0, 0, 35, 40, 45, 55, 65, 75, 80, 80, 80 };
 const int Cannon2PieceHead[13] = {0, 0, 0, 38, 32, 26, 20, 20, 20, 20, 20, 20};
 
@@ -246,15 +272,15 @@ void eval_init()
 
 	ThreatValue[Cannon][Rook] = 60;
 	ThreatValue[Cannon][Knight] = 36;
-	ThreatValue[Cannon][Cannon] = 13;
+	ThreatValue[Cannon][Cannon] = 0;
 	ThreatValue[Cannon][Pawn] = 4;
 	ThreatValue[Cannon][Advisor] = 11;
 	ThreatValue[Cannon][Bishop] = 14;
 	ThreatValue[Cannon][King] = 0;
 
-	ThreatValue[Pawn][Rook] = 60;
-	ThreatValue[Pawn][Knight] = 50;
-	ThreatValue[Pawn][Cannon] = 50;
+	ThreatValue[Pawn][Rook] = 83;
+	ThreatValue[Pawn][Knight] = 64;
+	ThreatValue[Pawn][Cannon] = 56;
 	ThreatValue[Pawn][Pawn] = 0;
 	ThreatValue[Pawn][Advisor] = 0;
 	ThreatValue[Pawn][Bishop] = 0;
@@ -410,7 +436,6 @@ int eval( board_t *board, int alpha, int beta, int ThreadId )
 	opening += mat_info->opening;
 	endgame += mat_info->endgame;
 
-
 	// pst
 
 	opening += board->opening;
@@ -491,6 +516,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 	bool equalking;
 	bool cannonthreat;
     int attprotect[ColourNb];
+	int control[ColourNb];
 	
 
 	ASSERT(board != NULL);
@@ -506,6 +532,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 		op[colour] = 0;
 		eg[colour] = 0;
 		attprotect[colour] = 0;
+		control[colour] = 0;
 	}
 
 	// eval
@@ -564,7 +591,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 						attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
 
 						ControlArea[me][to]++;
-
+                        control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
 					}
 
 					++index;
@@ -628,6 +655,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 
 
 						attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
+						control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
 
 						if(SQUARE_COLOUR(to) == opp)
 							cannonthreat = true;
@@ -655,6 +683,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 						}
 
 						attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
+						control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
 
 						if(SQUARE_COLOUR(to) == opp)
 							cannonthreat = true;
@@ -672,6 +701,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					to=CannonFileControlMoves[row][filebit][index] + col;
 					con += 1;
 					ControlArea[me][to]++;
+					 control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
 					++index;
@@ -683,6 +713,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					to=CannonRankControlMoves[col][rankbit][index] + (row << 4);
 					con += 1;
 					ControlArea[me][to]++;
+					 control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
 
@@ -740,6 +771,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					ControlArea[me][to]++;
 
 					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
+					 control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
 
 					++index;
 				}
@@ -784,6 +816,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					ControlArea[me][to]++;
 
 					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
+					control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
 
 					++index;
 				}
@@ -887,6 +920,8 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 
 					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
 
+					 control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
                           equalking = true;
 
@@ -906,6 +941,8 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 
 					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
 
+					control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
 
@@ -918,6 +955,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					to=FileNoneCapMoves[row][filebit][index] + col;
 					mob += 1;
 					ControlArea[me][to]++;
+					control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
 					++index;
@@ -929,6 +967,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					to=RankNoneCapMoves[col][rankbit][index] + (row << 4);
 					mob += 1;
 					ControlArea[me][to]++;
+					control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
 
@@ -972,8 +1011,8 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 
 	// update
 
-	*opening += ((op[Red] - op[Black]) * PieceActivityWeightOpening) / 256 + (attprotect[Red] - attprotect[Black] )/2;
-	*endgame += ((eg[Red] - eg[Black]) * PieceActivityWeightEndgame) / 256 + (attprotect[Red] - attprotect[Black] )/2;
+	*opening += ((op[Red] - op[Black]) * PieceActivityWeightOpening) / 256 + (attprotect[Red] - attprotect[Black] )/2 +(control[Red] - control[Black]);
+	*endgame += ((eg[Red] - eg[Black]) * PieceActivityWeightEndgame) / 256 + (attprotect[Red] - attprotect[Black] )/2 +(control[Red] - control[Black]);
 }
 
 static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlArea[2][256])
@@ -1431,8 +1470,11 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 						{
 							if( ControlArea[me][to] >=  ControlArea[opp][to])
 							{
-								op[me] += CannonEmptyHead[file_distance(from, king)];
-							    eg[me] += CannonEmptyHead[file_distance(from, king)];
+								if( (me == Red && board->number[RedRook] > 0) || (me == Black && board->number[BlackRook] > 0) )
+								{
+									op[me] += CannonEmptyHead[rank_distance(from, king)];
+									eg[me] += CannonEmptyHead[rank_distance(from, king)];
+								}
 							}
 						}
 
@@ -1441,8 +1483,8 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 						{
 							if( ControlArea[me][to] >=  ControlArea[opp][to])
 							{
-								op[me] += Cannon2PieceHead[file_distance(from, king)];
-							    eg[me] += Cannon2PieceHead[file_distance(from, king)];
+								op[me] += Cannon2PieceHead[rank_distance(from, king)];
+							    eg[me] += Cannon2PieceHead[rank_distance(from, king)];
 							}
 						}
 					}
@@ -1450,14 +1492,17 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 					{
 						if(PinNb[col][king_col][rowbit] == 0 && ControlArea[me][to] >=  ControlArea[opp][to])
 						{
-							op[me] += CannonEmptyHead[rank_distance(from, king)];
-							eg[me] += CannonEmptyHead[rank_distance(from, king)];
+							if( (me == Red && board->number[RedRook] > 0) || (me == Black && board->number[BlackRook] > 0) )
+							{
+								op[me] += CannonEmptyHead[file_distance(from, king)];
+								eg[me] += CannonEmptyHead[file_distance(from, king)];
+							}
 						}
 
 						if(PinNb[col][king_col][rowbit] == 2&& ControlArea[me][to] >=  ControlArea[opp][to])
 						{
-							op[me] += Cannon2PieceHead[rank_distance(from, king)];
-							eg[me] += Cannon2PieceHead[rank_distance(from, king)];
+							op[me] += Cannon2PieceHead[file_distance(from, king)];
+							eg[me] += Cannon2PieceHead[file_distance(from, king)];
 						}
 					}
 
@@ -1594,7 +1639,59 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 				break;
 			}
 		}
+
+		//
+
+		if(me == Red)
+		{
+			
+			int rook0 = board->piece[PIECE_TO_INDEX(RedRook)];
+			int rook1 = board->piece[PIECE_TO_INDEX(RedRook) + 1];
+			int Knight0 = board->piece[PIECE_TO_INDEX(RedKnight)];
+			int Knight1 = board->piece[PIECE_TO_INDEX(RedKnight) + 1];
+			int Cannon0 = board->piece[PIECE_TO_INDEX(RedCannon)];
+			int Cannon1 = board->piece[PIECE_TO_INDEX(RedCannon) + 1];
+
+			if(board->number[RedRook] == 2)
+			{
+				if(EQUAL_FILE(rook0, rook1))
+				{
+					if(SQUARE_FILE(rook0) == 0x6 || SQUARE_FILE(rook0) == 0x8)
+					{
+						op[me] += Rook3Attack;
+						eg[me] += Rook3Attack;
+					}
+				}
+			}
+
+			// left
+            
+		    // right
+
+		}
+		else
+		{
+			int rook0 = board->piece[PIECE_TO_INDEX(BlackRook)];
+			int rook1 = board->piece[PIECE_TO_INDEX(BlackRook) + 1];
+			int Knight0 = board->piece[PIECE_TO_INDEX(RedKnight)];
+			int Knight1 = board->piece[PIECE_TO_INDEX(RedKnight) + 1];
+			int Cannon0 = board->piece[PIECE_TO_INDEX(RedCannon)];
+			int Cannon1 = board->piece[PIECE_TO_INDEX(RedCannon) + 1];
+			if(board->number[BlackRook] == 2)
+			{
+				if(EQUAL_FILE(rook0, rook1))
+				{
+					if(SQUARE_FILE(rook0) == 0x6 || SQUARE_FILE(rook0) == 0x8)
+					{
+						op[me] += Rook3Attack;
+						eg[me] += Rook3Attack;
+					}
+				}
+			}
+		}		
+		
 	}
+
 
 	*opening += ((op[Red] - op[Black]) * 256) / 256;
 	*endgame += ((eg[Red] - eg[Black]) * 256) / 256;

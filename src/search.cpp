@@ -1182,7 +1182,13 @@ static int full_search( board_t *board, int alpha, int beta, int depth, int heig
 	// draw?
 
 	if( board_is_repetition(board) )
-		return ValueDraw;
+	{
+		if(board->turn == Red)
+			return -ValueRepeatValue;
+		else
+			return ValueRepeatValue;
+	}
+		//return ValueDraw;
 
 	// mate-distance pruning
 
@@ -1781,7 +1787,13 @@ static int full_quiescence( board_t *board, int alpha, int beta, int depth, int 
 	// draw?
 
 	if( board_is_repetition(board) )
-		return  ValueDraw;// cyclon is ValueDraw;
+	{
+		if(board->turn == Red)
+			return -ValueRepeatValue;
+		else
+			return ValueRepeatValue;
+		//return  ValueDraw;// cyclon is ValueDraw;
+	}
 
 	//if( recog_draw(board, ThreadId) )
 	//    return ValueDraw;

@@ -23,6 +23,7 @@ const int ValueWin = 3000;
 const int ValuePly = 40;
 const int ValueInf = ValueMate;
 const int ValueEvalInf = ValueMate - 256; // handle mates upto 255 plies
+const int ValueRepeatValue = 23000;
 
 // macros
 

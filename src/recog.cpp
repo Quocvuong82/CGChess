@@ -17,6 +17,7 @@
 // functions
 
 // recog_draw()
+bool draw_krkr( const board_t *board);
 
 bool recog_draw( const board_t *board, int ThreadId )
 {
@@ -50,8 +51,45 @@ bool recog_draw( const board_t *board, int ThreadId )
 		 return true;
 	 else if(mat_info->recog == MAT_KPKP)
 		 return true;
+	 else if(mat_info->recog == MAT_KRKR)
+	 {
+        return draw_krkr(board);
+	 }
 
 	
+	return false;
+}
+
+bool draw_krkr( const board_t *board)
+{
+	int rrook, brook;
+	int rking, bking;
+
+	if(board->piece[PIECE_TO_INDEX(RedRook)] != PieceNone)
+		rrook = board->piece[PIECE_TO_INDEX(RedRook)];
+
+	if(board->piece[PIECE_TO_INDEX(RedRook) + 1] != PieceNone)
+		rrook = board->piece[PIECE_TO_INDEX(RedRook) + 1];
+
+	if(board->piece[PIECE_TO_INDEX(BlackRook)] != PieceNone)
+		brook = board->piece[PIECE_TO_INDEX(RedRook)];
+
+	if(board->piece[PIECE_TO_INDEX(BlackRook) + 1] != PieceNone)
+		brook = board->piece[PIECE_TO_INDEX(RedRook) + 1];
+
+	rking = KING_POS(board, Red);
+	bking = KING_POS(board, Black);
+
+	if(EQUAL_FILE(rrook, rking) && EQUAL_RANK(brook, bking))
+		return true;
+
+    if(SQUARE_FILE(rking) != 0x7 && SQUARE_FILE(bking) != 0x7)
+	{
+		if(SQUARE_RANK(rking) < 0xa && SQUARE_RANK(bking) > 0x5)
+			return true;
+
+	} 
+
 	return false;
 }
 
