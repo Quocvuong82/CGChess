@@ -1011,8 +1011,8 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 
 	// update
 
-	*opening += ((op[Red] - op[Black]) * PieceActivityWeightOpening) / 256 + (attprotect[Red] - attprotect[Black] )/2 +(control[Red] - control[Black]);
-	*endgame += ((eg[Red] - eg[Black]) * PieceActivityWeightEndgame) / 256 + (attprotect[Red] - attprotect[Black] )/2 +(control[Red] - control[Black]);
+	*opening += ((op[Red] - op[Black]) * PieceActivityWeightOpening) / 256 + (attprotect[Red] - attprotect[Black] )/2;
+	*endgame += ((eg[Red] - eg[Black]) * PieceActivityWeightEndgame) / 256 + (attprotect[Red] - attprotect[Black] )/2;
 }
 
 static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlArea[2][256])
@@ -1640,55 +1640,7 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 			}
 		}
 
-		//
-
-		if(me == Red)
-		{
-			
-			int rook0 = board->piece[PIECE_TO_INDEX(RedRook)];
-			int rook1 = board->piece[PIECE_TO_INDEX(RedRook) + 1];
-			int Knight0 = board->piece[PIECE_TO_INDEX(RedKnight)];
-			int Knight1 = board->piece[PIECE_TO_INDEX(RedKnight) + 1];
-			int Cannon0 = board->piece[PIECE_TO_INDEX(RedCannon)];
-			int Cannon1 = board->piece[PIECE_TO_INDEX(RedCannon) + 1];
-
-			if(board->number[RedRook] == 2)
-			{
-				if(EQUAL_FILE(rook0, rook1))
-				{
-					if(SQUARE_FILE(rook0) == 0x6 || SQUARE_FILE(rook0) == 0x8)
-					{
-						op[me] += Rook3Attack;
-						eg[me] += Rook3Attack;
-					}
-				}
-			}
-
-			// left
-            
-		    // right
-
-		}
-		else
-		{
-			int rook0 = board->piece[PIECE_TO_INDEX(BlackRook)];
-			int rook1 = board->piece[PIECE_TO_INDEX(BlackRook) + 1];
-			int Knight0 = board->piece[PIECE_TO_INDEX(RedKnight)];
-			int Knight1 = board->piece[PIECE_TO_INDEX(RedKnight) + 1];
-			int Cannon0 = board->piece[PIECE_TO_INDEX(RedCannon)];
-			int Cannon1 = board->piece[PIECE_TO_INDEX(RedCannon) + 1];
-			if(board->number[BlackRook] == 2)
-			{
-				if(EQUAL_FILE(rook0, rook1))
-				{
-					if(SQUARE_FILE(rook0) == 0x6 || SQUARE_FILE(rook0) == 0x8)
-					{
-						op[me] += Rook3Attack;
-						eg[me] += Rook3Attack;
-					}
-				}
-			}
-		}		
+		//	
 		
 	}
 
