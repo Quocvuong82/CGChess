@@ -55,7 +55,7 @@ extern bool board_is_legal( board_t *board );
 extern bool board_is_check( board_t *board );
 extern bool board_is_mate( board_t *board );
 extern bool board_is_stalemate( board_t *board );
-extern bool board_is_repetition( board_t *board );
+extern bool board_is_repetition( board_t *board, int height, int& value);
 extern int board_material( board_t *board );
 extern int board_opening( board_t *board );
 extern int board_endgame( board_t *board );

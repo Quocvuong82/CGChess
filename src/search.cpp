@@ -1142,6 +1142,7 @@ static int full_search( board_t *board, int alpha, int beta, int depth, int heig
 	mv_t new_pv[HeightMax];
 	mv_t played[256];
 	int FutilityMargin;
+	int repeat;
 
 	ASSERT(board != NULL);
 	ASSERT(range_is_ok(alpha, beta));
@@ -1181,12 +1182,9 @@ static int full_search( board_t *board, int alpha, int beta, int depth, int heig
 
 	// draw?
 
-	if( board_is_repetition(board) )
+	if( board_is_repetition(board,height,repeat) )
 	{
-		if(board->turn == Red)
-			return -ValueRepeatValue;
-		else
-			return ValueRepeatValue;
+        return repeat;
 	}
 		//return ValueDraw;
 
@@ -1755,6 +1753,7 @@ static int full_quiescence( board_t *board, int alpha, int beta, int depth, int 
 	int best_move;
 	int move;
 	int opt_value;
+	int repeat;
 	attack_t attack[1];
 	sort_t sort[1];
 	undo_t undo[1];
@@ -1786,12 +1785,9 @@ static int full_quiescence( board_t *board, int alpha, int beta, int depth, int 
 
 	// draw?
 
-	if( board_is_repetition(board) )
+	if( board_is_repetition(board,height,repeat) )
 	{
-		if(board->turn == Red)
-			return -ValueRepeatValue;
-		else
-			return ValueRepeatValue;
+        return repeat;
 		//return  ValueDraw;// cyclon is ValueDraw;
 	}
 

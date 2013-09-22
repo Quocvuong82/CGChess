@@ -388,12 +388,14 @@ bool board_is_stalemate( board_t *board )
 
 // board_is_repetition()
 
-bool board_is_repetition( board_t *board )
+bool board_is_repetition( board_t *board , int height, int& value)
 {
 
 	int i;
 
 	ASSERT(board != NULL);
+
+	value = ValueDraw;
 
 	// 50-move rule
 
@@ -413,11 +415,23 @@ bool board_is_repetition( board_t *board )
 	for ( i = 4; i <= board->ply_nb; i += 2 )
 	{
 		if( board->stack[board->sp - i] == board->key )
+		{
+			if(i&0x01)
+			{
+				value = ValueRepeatValue - height;
+			}
+			else
+			{
+				value = -ValueRepeatValue + height;
+			}
 			return true;
+		}
 	}
 
 	return false;
 }
+
+
 
 // board_opening()
 
