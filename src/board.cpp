@@ -415,7 +415,7 @@ bool board_is_repetition( board_t *board , int height, int& value)
 	for ( i = 4; i <= board->ply_nb; i += 2 )
 	{
 		if( board->stack[board->sp - i] == board->key )
-		{
+		{			
 			if(i&0x01)
 			{
 				value = ValueRepeatValue - height;
@@ -424,6 +424,7 @@ bool board_is_repetition( board_t *board , int height, int& value)
 			{
 				value = -ValueRepeatValue + height;
 			}
+
 			return true;
 		}
 	}
