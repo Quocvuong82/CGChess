@@ -42,13 +42,13 @@ const int KnightOutpost[2][90] =
 
 const int PawnOutpost[2][90] =
 {
-	//------------------------------------------
+	
 	1,  2,  3,  5,  5,  5,  3,  2,  1,
 	5,	10, 15, 20, 35, 20, 15, 10, 5,
 	5,	10, 15, 20, 20, 20, 15, 10, 5,
 	5,	10, 15, 15, 15, 15, 15, 10, 5,
 	5,	5,  10, 10, 15, 10, 10,  5, 5,
-	//-------------------------------//
+	
 	0,	 0, 10, 0,  10,  0, 10,  0, 0,
 	0,	 0,-10,  0,  5,  0,-10,  0, 0,
 	0,	 0,  0,  0,  0,  0,  0,  0, 0,
@@ -60,7 +60,7 @@ const int PawnOutpost[2][90] =
 	0,	 0,  0,  0,  0,  0,  0,  0, 0,
 	0,	 0, -5,  0,  5,  0, -5,  0, 0,
 	3,	 0, 10, 0,  10,  0, 10,  0, 3,
-	//-------------------------------//
+	
 	5,	5,  10, 10, 15, 10, 10,  5, 5,
 	5,	10, 15, 15, 15, 15, 15, 10, 5,
 	5,	10, 15, 20, 20, 20, 15, 10, 5,
@@ -93,30 +93,6 @@ const int CannonOutPost[2][90] =
 	0,	 0,  0,  0,  0,  0,  0,  0,  0, 
 };
 
-const int SpaceControlArea[2][90] = 
-{
-	1,	 1,  2,  3,  4,  3,  2,  1,  1,
-	1,	 1,  1,  1,  3,  1,  1,  1,  1,
-	1,	 1,  1,  1,  1,  1,  1,  1,  1,
-	1,	 1,  1,  1,  1,  1,  1,  1,  1,
-	1,	 1,  1,  1,  1,  1,  1,  1,  1,
-	0,	 1,  1,  1,  1,  1,  1,  1,  0,
-	0,	 0,  0,  0,  1,  0,  0,  0,  0,
-	0,	 0,  0,  0,  0,  0,  0,  0,  0,
-	0,	 0,  0,  0,  0,  0,  0,  0,  0, 
-	0,	 0,  0,  0,  0,  0,  0,  0,  0, 
-
-	0,	 0,  0,  0,  0,  0,  0,  0,  0,
-	0,	 0,  0,  0,  0,  0,  0,  0,  0,
-	0,	 0,  0,  0,  0,  0,  0,  0,  0,
-	0,	 0,  0,  0,  1,  0,  0,  0,  0, 
-	0,	 1,  1,  1,  1,  1,  1,  1,  0, 
-	1,	 1,  1,  1,  1,  1,  1,  1,  1,
-	1,	 1,  1,  1,  1,  1,  1,  1,  1,
-	1,	 1,  1,  1,  1,  1,  1,  1,  1,
-	1,	 1,  1,  1,  3,  1,  1,  1,  1,
-	1,	 1,  2,  3,  4,  3,  2,  1,  1,
-};
 
 const int KnightMobOpen[10] = { -50, -10, 0, 10, 30, 40, 50, 52, 54, 56};
 const int KnightMobEnd[10] =  { -50, -10, 0, 10, 30, 40, 50, 52, 54, 56};
@@ -516,7 +492,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 	bool equalking;
 	bool cannonthreat;
     int attprotect[ColourNb];
-	int control[ColourNb];
+
 	
 
 	ASSERT(board != NULL);
@@ -532,7 +508,6 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 		op[colour] = 0;
 		eg[colour] = 0;
 		attprotect[colour] = 0;
-		control[colour] = 0;
 	}
 
 	// eval
@@ -582,7 +557,6 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					{
 						to = KnightMoves[from][index];
 
-
 						if( !INDEX_SAME_COLOUR( board->square[from],  board->square[to]))
 						{							
 							mob += 1;
@@ -591,7 +565,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 						attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
 
 						ControlArea[me][to]++;
-                        control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+                        
 					}
 
 					++index;
@@ -641,9 +615,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 				index=0;
 				while(CannonFileCapMoves[row][filebit][index])
 				{
-					to = CannonFileCapMoves[row][filebit][index] + col;
-
-					
+					to = CannonFileCapMoves[row][filebit][index] + col;					
 					{
 						if(!INDEX_SAME_COLOUR(board->square[from], board->square[to]))
 						{
@@ -653,9 +625,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 							ControlArea[me][to]++;
 						}
 
-
-						attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
-						control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+						attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];						
 
 						if(SQUARE_COLOUR(to) == opp)
 							cannonthreat = true;
@@ -670,9 +640,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 				index=0;
 				while(CannonRankCapMoves[col][rankbit][index])
 				{
-					to = CannonRankCapMoves[col][rankbit][index] + (row << 4);
-
-					
+					to = CannonRankCapMoves[col][rankbit][index] + (row << 4);					
 					{
 						if(!INDEX_SAME_COLOUR(board->square[from], board->square[to])  )
 						{
@@ -682,8 +650,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 							ControlArea[me][to]++;
 						}
 
-						attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
-						control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+						attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];						
 
 						if(SQUARE_COLOUR(to) == opp)
 							cannonthreat = true;
@@ -701,7 +668,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					to=CannonFileControlMoves[row][filebit][index] + col;
 					con += 1;
 					ControlArea[me][to]++;
-					 control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+					
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
 					++index;
@@ -713,7 +680,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					to=CannonRankControlMoves[col][rankbit][index] + (row << 4);
 					con += 1;
 					ControlArea[me][to]++;
-					 control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+					
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
 
@@ -770,8 +737,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					}
 					ControlArea[me][to]++;
 
-					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
-					 control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];					
 
 					++index;
 				}
@@ -780,16 +746,12 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 				op[me] += PawnMobOpen[mob] ;
 				eg[me] += PawnMobEnd[mob] ;
 
-
-
 				new_mob = 10 - ((ABS(king_file - col) + ABS(king_rank - row)));
 
 				op[me] += new_mob;
 				eg[me] += new_mob;
-
 				
                 op[me] += PawnOutpost[me][SQUARE_TO_90(from)];
-
 
 				if(SQUARE_RANK(from) <= Rank4)
 				{	
@@ -815,8 +777,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 
 					ControlArea[me][to]++;
 
-					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
-					control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];					
 
 					++index;
 				}
@@ -825,14 +786,12 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 				op[me] += PawnMobOpen[mob] ;
 				eg[me] += PawnMobEnd[mob] ;
 
-
 				new_mob = 10 - ((ABS(king_file - col) + ABS(king_rank - row)));
 
 				op[me] += new_mob;
 				eg[me] += new_mob;
 
 				op[me] += PawnOutpost[me][SQUARE_TO_90(from)];
-
 
 				if(SQUARE_RANK(from) >= Rank5)
 				{	
@@ -920,8 +879,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 
 					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
 
-					 control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
-
+					
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
                           equalking = true;
 
@@ -939,9 +897,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 
 					ControlArea[me][to]++;
 
-					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];
-
-					control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+					attprotect[me] += AttackAndProtected[INDEX_TO_TYPE(piece)][INDEX_TO_TYPE(board->square[to])];					
 
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
@@ -955,7 +911,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					to=FileNoneCapMoves[row][filebit][index] + col;
 					mob += 1;
 					ControlArea[me][to]++;
-					control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+					
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
 					++index;
@@ -967,7 +923,7 @@ static void eval_piece( board_t *board, const material_info_t *mat_info, const p
 					to=RankNoneCapMoves[col][rankbit][index] + (row << 4);
 					mob += 1;
 					ControlArea[me][to]++;
-					control[me] += SpaceControlArea[me][SQUARE_TO_90(to)];
+					
 					if(EQUAL_FILE(to, king) || EQUAL_RANK(to, king))
 						equalking = true;
 
