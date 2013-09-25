@@ -392,6 +392,7 @@ bool board_is_repetition( board_t *board , int height, int& value)
 {
 
 	int i;
+	int n;
 
 	ASSERT(board != NULL);
 
@@ -412,20 +413,25 @@ bool board_is_repetition( board_t *board , int height, int& value)
 
 	ASSERT(board->sp >= board->ply_nb);
 
+	n = 0;
 	for ( i = 4; i <= board->ply_nb; i += 2 )
 	{
 		if( board->stack[board->sp - i] == board->key )
-		{			
-			if(i&0x01)
+		{
+			n++;
+			if(n > 2)
 			{
-				value = ValueRepeatValue - height;
-			}
-			else
-			{
-				value = -ValueRepeatValue + height;
-			}
+				if(i&0x01)
+				{
+					value = ValueRepeatValue - height;
+				}
+				else
+				{
+					value = -ValueRepeatValue + height;
+				}
 
-			return true;
+				return true;
+			}
 		}
 	}
 

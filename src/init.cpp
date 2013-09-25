@@ -127,8 +127,8 @@ int StormOpening = 10;
 // material
 int MaterialWeightOpening = 256;
 int MaterialWeightEndgame = 256;
-int PawnOpening = 70;
-int PawnEndgame = 120;
+int PawnOpening = 90;
+int PawnEndgame = 150;
 int KnightOpening = 500;
 int KnightEndgame = 520;
 int CannonOpening = 520;

@@ -1474,6 +1474,13 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 								{
 									op[me] += CannonEmptyHead[rank_distance(from, king)];
 									eg[me] += CannonEmptyHead[rank_distance(from, king)];
+
+								}
+								if( (me == Red && board->number[RedRook] > 1) || (me == Black && board->number[BlackRook] > 1) )
+								{
+									op[me] += CannonEmptyHead[rank_distance(from, king)];
+									eg[me] += CannonEmptyHead[rank_distance(from, king)];
+
 								}
 							}
 						}
@@ -1497,6 +1504,7 @@ static void eval_pattern(board_t *board,int *opening, int *endgame, int ControlA
 								op[me] += CannonEmptyHead[file_distance(from, king)];
 								eg[me] += CannonEmptyHead[file_distance(from, king)];
 							}
+
 						}
 
 						if(PinNb[col][king_col][rowbit] == 2&& ControlArea[me][to] >=  ControlArea[opp][to])
